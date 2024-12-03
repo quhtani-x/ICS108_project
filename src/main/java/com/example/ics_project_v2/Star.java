@@ -72,10 +72,10 @@ public class Star {
     }
 
     // Method to change the radii of the star
-    public void setRadiuses(double newOuterRadius, double newInnerRadius) {
+    public void Increment() {
         // Update the radii
-        this.outerRadius = newOuterRadius;
-        this.innerRadius = newInnerRadius;
+        this.outerRadius *= 1.01;
+        this.innerRadius *= 1.01;
 
         // Regenerate the edges with the new radii
         generateStarEdges();
@@ -89,10 +89,7 @@ public class Star {
         return lines;
     }
 
-    // Method to animate the star and make it grow
 
-
-        // Set the timeline to repeat indefinitely
 
     }
 

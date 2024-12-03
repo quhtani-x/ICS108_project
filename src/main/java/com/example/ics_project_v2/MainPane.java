@@ -1,11 +1,14 @@
 package com.example.ics_project_v2;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 public class MainPane {
     private Pane pane = null;
@@ -50,6 +53,19 @@ public class MainPane {
                 }
             }
         });
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), e -> {
+                    // Gradually increase the radii of the star
+                      // Max outer radius is 300
+                        pane.getChildren().removeAll(star.getLines());
+                        star.Increment();
+                        pane.getChildren().addAll(star.getLines());
+
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 
     public Pane getPane() {
