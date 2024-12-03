@@ -1,5 +1,5 @@
 package com.example.ics_project_v2;
-
+import java.util.ArrayList;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.input.KeyCode;
@@ -16,6 +16,7 @@ public class MainPane {
     private RandomColorGenerator colorGenerator = new RandomColorGenerator();
     private Star star; // The star instance
     private Circle ball; // The ball instance
+
 
     public MainPane() {
         // Create the Text label for chances left
@@ -55,7 +56,7 @@ public class MainPane {
         });
 
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), e -> {
+                new KeyFrame(Duration.millis(45), e -> {
                     // Gradually increase the radii of the star
                       // Max outer radius is 300
                         pane.getChildren().removeAll(star.getLines());
@@ -64,6 +65,12 @@ public class MainPane {
 
                 })
         );
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(200),e ->{
+            Star newStar = new Star();
+            pane.getChildren().addAll(newStar.getLines() );
+
+
+                }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }

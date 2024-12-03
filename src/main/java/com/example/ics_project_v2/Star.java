@@ -75,7 +75,7 @@ public class Star {
     public void Increment() {
         // Update the radii
         this.outerRadius *= 1.01;
-        this.innerRadius *= 1.01;
+        this.innerRadius *= 1.008;
 
         // Regenerate the edges with the new radii
         generateStarEdges();
