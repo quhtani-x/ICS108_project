@@ -6,11 +6,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MainPane {
     private Pane pane = null;
@@ -39,6 +41,7 @@ public class MainPane {
         pane.setOnMouseMoved(e -> {
             ball.setCenterX(e.getX());
             ball.setCenterY(e.getY());
+            checkStarCollision(); // Check for collision with stars on every move
         });
 
         // Handle key press event for changing ball color
@@ -54,7 +57,7 @@ public class MainPane {
             }
         });
 
-        // Timeline for adding a new star every 200 milliseconds
+        // Timeline for adding a new star every 1000 milliseconds (1 second)
         Timeline addStarTimeline = new Timeline(
                 new KeyFrame(Duration.millis(1000), e -> {
                     // Create a new star and add it to the list of stars
@@ -68,7 +71,7 @@ public class MainPane {
         addStarTimeline.setCycleCount(Timeline.INDEFINITE);  // Repeat indefinitely
         addStarTimeline.play();  // Start the animation loop for adding stars
 
-        // Timeline for growing stars every 45 milliseconds
+        // Timeline for growing stars every 70 milliseconds
         Timeline growStarsTimeline = new Timeline(
                 new KeyFrame(Duration.millis(70), e -> {
                     // Update all stars (including new ones) by incrementing their size
@@ -86,4 +89,27 @@ public class MainPane {
     public Pane getPane() {
         return pane;
     }
+
+    // Method to check if the ball intersects any star lines
+    private void checkStarCollision() {
+        // Iterate over each star
+        Iterator<Star> iterator = stars.iterator();
+        while (iterator.hasNext()) {
+            Star star = iterator.next();
+            // Iterate over each line of the star
+            for (Line line : star.getLines()) {
+                // Check if the ball intersects the line of the star
+                if (line.getBoundsInParent().intersects(ball.getBoundsInParent())) {
+                    // Check if the line color matches the ball's color, but first check for null
+                    if (line.getStroke() != null && line.getStroke().equals(ball.getFill())) {
+                        // If so, remove the star and its lines
+                        pane.getChildren().removeAll(star.getLines());  // Remove the star's lines
+                        iterator.remove();  // Remove the star from the list
+                        break;  // No need to check further lines for this star
+                    }
+                }
+            }
+        }
+    }
+
 }

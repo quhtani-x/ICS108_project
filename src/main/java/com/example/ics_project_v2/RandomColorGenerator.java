@@ -2,6 +2,7 @@ package com.example.ics_project_v2;
 import javafx.scene.paint.Color;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class RandomColorGenerator {
@@ -33,5 +34,10 @@ public class RandomColorGenerator {
         Random rand = new Random();
         return ColorArr.get(rand.nextInt(ColorArr.size()));
 
+    }
+
+    public ArrayList<Color> getColorArr() {
+        Collections.shuffle(ColorArr);
+        return ColorArr;
     }
 }

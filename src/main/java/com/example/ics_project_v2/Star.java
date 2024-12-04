@@ -7,8 +7,13 @@ import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Star {
+    private RandomColorGenerator rg = new RandomColorGenerator();
+    private final ArrayList<Color> Colors = rg.getColorArr();
+
+
     private ArrayList<Edge> edges = new ArrayList<>();
     private ArrayList<Line> lines = new ArrayList<>();
 
@@ -58,16 +63,20 @@ public class Star {
 
     // Method to convert edges to Line objects for rendering
     public void convertEdgeToLine() {
-        lines.clear();  // Clear previous lines
+        lines.clear();
+
+        int i = 0;
         for (Edge edge : edges) {
+
             ArrayList<Double> cord = edge.getCordinate();
             double x1 = cord.get(0);
             double y1 = cord.get(1);
             double x2 = cord.get(2);
             double y2 = cord.get(3);
             Line line = new Line(x1, y1, x2, y2);
-            line.setStroke(edge.getColor());  // Set the color of the edge (can be modified if needed)
+            line.setStroke(Colors.get(i));  // Set the color of the edge (can be modified if needed)
             lines.add(line);
+            i+=1;
         }
     }
 
