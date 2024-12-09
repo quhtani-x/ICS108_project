@@ -1,5 +1,5 @@
 package com.example.ics_project_v2;
-
+/*
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -12,7 +12,7 @@ public class StarPane {
 
 
 
-    private Star star = new Star();
+    //private Star star = new Star();
 
 
 
@@ -34,4 +34,4 @@ public class StarPane {
         return StarPane;
     }
 
-}
+} */

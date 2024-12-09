@@ -1,104 +1,115 @@
 package com.example.ics_project_v2;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Star {
-    private RandomColorGenerator rg = new RandomColorGenerator();
-    private final ArrayList<Color> Colors = rg.getColorArr();
-
-
-    private ArrayList<Edge> edges = new ArrayList<>();
+    private double centerX;
+    private double centerY;
+    private double outerRadius;
+    private double innerRadius;
+    private int numPoints;
     private ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<Color> colors = new RandomColorGenerator().getColorArr();
 
-    // Fixed center for the star (center of an 800x800 window)
-    private static final double CENTER_X = 400.0;  // Center X for an 800x800 screen
-    private static final double CENTER_Y = 400.0;  // Center Y for an 800x800 screen
-    private double outerRadius = 200;  // Default outer radius
-    private double innerRadius = 100;  // Default inner radius
-    private static final int NUM_POINTS = 5;  // Fixed number of points for a 5-pointed star
+    private MainPane mainPane;
 
-    public Star() {
-        generateStarEdges();  // Generate the initial edges based on the default radii
-        convertEdgeToLine();  // Convert edges to lines for rendering
+    public Star(double centerX, double centerY, double outerRadius, double innerRadius, int numPoints, MainPane mainPane) {
+        this.centerX = centerX;
+        this.centerY = centerY;
+        this.outerRadius = outerRadius;
+        this.innerRadius = innerRadius;
+        this.numPoints = numPoints;
+        this.mainPane = mainPane;
+
+        generateLines();
     }
 
-    // Method to generate the edges of the star based on the current radii
-    private void generateStarEdges() {
-        edges.clear();  // Clear previous edges
-
-        double angle = 360.0 / NUM_POINTS;  // Angle between each point
-        double offsetAngle = -90.0;  // Rotate the star to make it upright
-
-        for (int i = 0; i < NUM_POINTS; i++) {
-            // Outer point (on the circumference of the circle)
-            double outerX = CENTER_X + outerRadius * Math.cos(Math.toRadians(i * angle + offsetAngle));
-            double outerY = CENTER_Y + outerRadius * Math.sin(Math.toRadians(i * angle + offsetAngle));
-
-            // Inner point (closer to the center of the circle)
-            double innerX = CENTER_X + innerRadius * Math.cos(Math.toRadians(i * angle + angle / 2 + offsetAngle));
-            double innerY = CENTER_Y + innerRadius * Math.sin(Math.toRadians(i * angle + angle / 2 + offsetAngle));
-
-            // Add the edge from the outer point to the inner point and then back to the next outer point
-            int nextPoint = (i + 1) % NUM_POINTS;
-            double nextOuterX = CENTER_X + outerRadius * Math.cos(Math.toRadians(nextPoint * angle + offsetAngle));
-            double nextOuterY = CENTER_Y + outerRadius * Math.sin(Math.toRadians(nextPoint * angle + offsetAngle));
-
-            // Create edges alternating between outer and inner points
-            edges.add(new Edge(outerX, outerY, innerX, innerY));  // Edge from outer to inner
-            edges.add(new Edge(innerX, innerY, nextOuterX, nextOuterY));  // Edge from inner to outer
-        }
-    }
-
-    // Getter to access the edges
-    public ArrayList<Edge> getEdges() {
-        return edges;
-    }
-
-    // Method to convert edges to Line objects for rendering
-    public void convertEdgeToLine() {
+    // Generate lines for the star
+    private void generateLines() {
         lines.clear();
 
-        int i = 0;
-        for (Edge edge : edges) {
+        double angleIncrement = 360.0 / numPoints; // Angle between outer points
+        double currentAngle = -90.0; // Start angle (rotated for upright star)
 
-            ArrayList<Double> cord = edge.getCordinate();
-            double x1 = cord.get(0);
-            double y1 = cord.get(1);
-            double x2 = cord.get(2);
-            double y2 = cord.get(3);
-            Line line = new Line(x1, y1, x2, y2);
-            line.setStroke(Colors.get(i));  // Set the color of the edge (can be modified if needed)
-            lines.add(line);
-            i+=1;
+        for (int i = 0; i < numPoints; i++) {
+            // Outer point
+            double outerX1 = centerX + outerRadius * Math.cos(Math.toRadians(currentAngle));
+            double outerY1 = centerY + outerRadius * Math.sin(Math.toRadians(currentAngle));
+
+            // Inner point
+            double innerAngle = currentAngle + angleIncrement / 2.0;
+            double innerX = centerX + innerRadius * Math.cos(Math.toRadians(innerAngle));
+            double innerY = centerY + innerRadius * Math.sin(Math.toRadians(innerAngle));
+
+            // Next outer point
+            double outerX2 = centerX + outerRadius * Math.cos(Math.toRadians(currentAngle + angleIncrement));
+            double outerY2 = centerY + outerRadius * Math.sin(Math.toRadians(currentAngle + angleIncrement));
+
+            // Create lines
+            Line outerToInner = createLine(outerX1, outerY1, innerX, innerY, i);
+            Line innerToOuter = createLine(innerX, innerY, outerX2, outerY2, i + 1);
+
+            lines.add(outerToInner);
+            lines.add(innerToOuter);
+
+            // Increment angle
+            currentAngle += angleIncrement;
         }
     }
 
-    // Method to change the radii of the star
-    public void Increment() {
-        // Update the radii
-        this.outerRadius *= 1.01;
-        this.innerRadius *= 1.008;
-
-        // Regenerate the edges with the new radii
-        generateStarEdges();
-
-        // Convert the updated edges to lines for rendering
-        convertEdgeToLine();
+    // Create a line with a specific color
+    private Line createLine(double x1, double y1, double x2, double y2, int colorIndex) {
+        Line line = new Line(x1, y1, x2, y2);
+        line.setStroke(colors.get(colorIndex % colors.size()));
+        line.setStrokeWidth(2); // Set line thickness if desired
+        return line;
     }
 
-    // Getter to access the lines (for rendering)
+    // Increment the star's size
+    public void incrementSize() {
+        this.outerRadius *= 1.01;
+        this.innerRadius *= 1.008;
+        generateLines();
+    }
+
+    // Get the star's lines for rendering
     public ArrayList<Line> getLines() {
         return lines;
     }
 
+    // Check for collisions with a ball
+    public boolean checkCollision(javafx.scene.shape.Circle ball) {
+        double ballRadius = ball.getRadius();
 
+        for (Line line : lines) {
+            double lineWidth = ballRadius * 0.8; // Narrow bounding box
+            double x1 = line.getStartX();
+            double y1 = line.getStartY();
+            double x2 = line.getEndX();
+            double y2 = line.getEndY();
 
+            // Create a custom bounding box around the line
+            double minX = Math.min(x1, x2) - lineWidth / 2;
+            double minY = Math.min(y1, y2) - lineWidth / 2;
+            double maxX = Math.max(x1, x2) + lineWidth / 2;
+            double maxY = Math.max(y1, y2) + lineWidth / 2;
+
+            // Check if the ball's bounding box intersects the custom bounding box
+            if (ball.getBoundsInParent().intersects(minX, minY, maxX - minX, maxY - minY)) {
+                if (line.getStroke() != null && line.getStroke().equals(ball.getFill())) {
+                    // Correct collision
+                    mainPane.removeStar(this);
+                    return true;
+                } else {
+                    // Wrong collision
+                    mainPane.handleWrongCollision();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
-
+}
