@@ -16,6 +16,7 @@ public class Edge {
         color = rg.getColor();
     }
 
+
       */
 
     public Color getColor() {
