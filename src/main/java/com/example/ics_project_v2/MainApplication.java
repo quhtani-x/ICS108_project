@@ -1,38 +1,27 @@
 package com.example.ics_project_v2;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class MainApplication extends Application {
-    //BallPane ballPane = new BallPane();
 
-    Pane pane = new MainPane().getPane();
+    //Pane pane = new MainPane().getPane();
 
+    //private Scene mainScene = new Scene(pane, 800, 800, Color.BLACK);
 
-
-
-
-    private Scene scene = new Scene(pane ,800 , 800 , Color.BLACK);
-
-
+    @Override
     public void start(Stage primaryStage) {
+        // Create the WelcomeScene and pass the mainScene
+        //pane.setStyle("-fx-background-color: black;");
+        WelcomeScene welcomeScene = new WelcomeScene(primaryStage);
 
-
-
-        primaryStage.setScene(scene);
+        // Set the initial scene to WelcomeScene
+        primaryStage.setScene(welcomeScene.getScene());
         primaryStage.show();
-        pane.requestFocus();
 
-
-
+        //pane.requestFocus();
     }
-
-
-
 }
