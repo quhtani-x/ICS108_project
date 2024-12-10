@@ -15,21 +15,24 @@ import java.util.Iterator;
 
 public class MainPane {
     private Pane pane;
-    private int ChangeColorChance = 5; // Initial number of attempts
-    private int score = 0; // Initial score
+    private int ChangeColorChance = 5;
+    private int score = 0;
+    private double growthInterval = 80; // Initial growth interval in milliseconds
+    private double spawnInterval = 2000; // Initial spawn interval in milliseconds
     private RandomColorGenerator colorGenerator = new RandomColorGenerator();
     private ArrayList<Star> stars = new ArrayList<>();
     private Circle ball;
-    private Text scoreText; // Text to display score
-    private Text chancesText; // Text to display remaining chances
-    private boolean gameOver = false; // Flag to check if the game has ended
+    private Text scoreText;
+    private Text chancesText;
+    private boolean gameOver = false;
+
+    private Timeline growStarsTimeline; // To dynamically adjust growth speed
+    private Timeline addStarTimeline;   // To dynamically adjust spawn interval
 
     public MainPane() {
-        // Initialize the pane
         pane = new Pane();
         ball = new Ball().getBall();
 
-        // Initialize the score and attempts text
         scoreText = new Text("Score: " + score);
         scoreText.setFont(new Font(20));
         scoreText.setFill(Color.WHITE);
@@ -42,10 +45,8 @@ public class MainPane {
         chancesText.setX(10);
         chancesText.setY(60);
 
-        // Add the ball, score, and chances text to the pane
         pane.getChildren().addAll(ball, scoreText, chancesText);
 
-        // Update ball's position on mouse move
         pane.setOnMouseMoved(e -> {
             if (!gameOver) {
                 ball.setCenterX(e.getX());
@@ -54,7 +55,6 @@ public class MainPane {
             }
         });
 
-        // Handle key press event for changing ball color
         pane.setOnKeyPressed(e -> {
             if (!gameOver && e.getCode() == KeyCode.UP) {
                 if (ChangeColorChance > 0) {
@@ -65,22 +65,13 @@ public class MainPane {
             }
         });
 
-        // Timeline for adding a new star every 2500 milliseconds
-        Timeline addStarTimeline = new Timeline(
-                new KeyFrame(Duration.millis(2500), e -> {
-                    if (!gameOver) {
-                        Star newStar = new Star(400, 400, 200, 100, 5, this); // Create a new star
-                        stars.add(newStar);
-                        pane.getChildren().addAll(newStar.getLines());
-                    }
-                })
-        );
-        addStarTimeline.setCycleCount(Timeline.INDEFINITE);
-        addStarTimeline.play();
+        createAddStarTimeline(); // Initialize and start the spawn timeline
+        createGrowStarsTimeline(); // Initialize and start the growth timeline
+    }
 
-        // Timeline for growing stars every 80 milliseconds
-        Timeline growStarsTimeline = new Timeline(
-                new KeyFrame(Duration.millis(80), e -> {
+    private void createGrowStarsTimeline() {
+        growStarsTimeline = new Timeline(
+                new KeyFrame(Duration.millis(growthInterval), e -> {
                     if (!gameOver) {
                         Iterator<Star> iterator = stars.iterator();
                         while (iterator.hasNext()) {
@@ -104,6 +95,20 @@ public class MainPane {
         growStarsTimeline.play();
     }
 
+    private void createAddStarTimeline() {
+        addStarTimeline = new Timeline(
+                new KeyFrame(Duration.millis(spawnInterval), e -> {
+                    if (!gameOver) {
+                        Star newStar = new Star(400, 400, 200, 100, 5, this);
+                        stars.add(newStar);
+                        pane.getChildren().addAll(newStar.getLines());
+                    }
+                })
+        );
+        addStarTimeline.setCycleCount(Timeline.INDEFINITE);
+        addStarTimeline.play();
+    }
+
     public Pane getPane() {
         return pane;
     }
@@ -116,7 +121,7 @@ public class MainPane {
     public void handleWrongCollision() {
         if (gameOver) return;
 
-        ChangeColorChance--; // Decrease attempts when the ball is deleted
+        ChangeColorChance--;
         updateChancesText();
 
         if (ChangeColorChance <= 0) {
@@ -130,7 +135,6 @@ public class MainPane {
         pane.getChildren().remove(ball);
         pane.setOnMouseMoved(null);
 
-        // Start a Timeline to respawn the ball after 1 second
         Timeline respawnTimeline = new Timeline(
                 new KeyFrame(Duration.seconds(1), e -> {
                     ball.setCenterX(currentX);
@@ -168,11 +172,31 @@ public class MainPane {
     private void terminateGame() {
         gameOver = true;
         pane.getChildren().clear();
+        growStarsTimeline.stop();
+        addStarTimeline.stop();
         Text gameOverText = new Text("Game Over\nFinal Score: " + score);
         gameOverText.setFont(new Font(40));
         gameOverText.setFill(Color.RED);
         gameOverText.setX(200);
         gameOverText.setY(400);
         pane.getChildren().add(gameOverText);
+    }
+
+    public void incrementScore() {
+        score++;
+        updateScoreText();
+
+        // Check if the score is a multiple of 3
+        if (score % 3 == 0) {
+            // Halve the growth interval
+            growthInterval = Math.max(10, growthInterval / 2);
+            growStarsTimeline.stop();
+            createGrowStarsTimeline();
+
+            // Halve the spawn interval
+            spawnInterval = Math.max(250, spawnInterval / 2); // Ensure a minimum spawn interval
+            addStarTimeline.stop();
+            createAddStarTimeline();
+        }
     }
 }
