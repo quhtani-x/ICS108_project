@@ -28,7 +28,6 @@ public class Star {
         generateLines();
     }
 
-    // Generate lines for the star
     private void generateLines() {
         lines.clear();
 
@@ -84,14 +83,14 @@ public class Star {
             double x2 = line.getEndX();
             double y2 = line.getEndY();
 
-            // Check if the circle intersects with the line segment
+
             if (circleIntersectsLine(ballX, ballY, ballRadius, x1, y1, x2, y2)) {
                 if (line.getStroke() != null && line.getStroke().equals(ball.getFill())) {
-                    mainPane.incrementScore(); // Correct collision: increase score
-                    mainPane.removeStar(this); // Remove the star
+                    mainPane.incrementScore();
+                    mainPane.removeStar(this);
                     return true;
                 } else {
-                    mainPane.handleWrongCollision(); // Wrong collision: handle it
+                    mainPane.handleWrongCollision();
                     return true;
                 }
             }
@@ -99,38 +98,21 @@ public class Star {
         return false;
     }
 
-    /**
-     * Check if a circle intersects with a line segment.
-     * @param cx Circle center X
-     * @param cy Circle center Y
-     * @param radius Circle radius
-     * @param x1 Line start X
-     * @param y1 Line start Y
-     * @param x2 Line end X
-     * @param y2 Line end Y
-     * @return True if the circle intersects the line segment, false otherwise.
-     */
+
     private boolean circleIntersectsLine(double cx, double cy, double radius, double x1, double y1, double x2, double y2) {
-        // Vector from line start to line end
         double dx = x2 - x1;
         double dy = y2 - y1;
 
-        // Handle degenerate case where the line segment is a single point
         if (dx == 0 && dy == 0) {
             return Math.hypot(cx - x1, cy - y1) <= radius;
         }
 
-        // Project the circle's center onto the line (parametrically)
         double t = ((cx - x1) * dx + (cy - y1) * dy) / (dx * dx + dy * dy);
 
-        // Clamp t to the range [0, 1] to stay on the line segment
         t = Math.max(0, Math.min(1, t));
 
-        // Find the closest point on the line segment
         double closestX = x1 + t * dx;
         double closestY = y1 + t * dy;
-
-        // Calculate the distance from the circle's center to the closest point
         double distance = Math.hypot(cx - closestX, cy - closestY);
 
         return distance <= radius;

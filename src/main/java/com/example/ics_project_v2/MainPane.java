@@ -1,21 +1,13 @@
 package com.example.ics_project_v2;
 import java.io.*;
-import java.util.Scanner;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import java.util.*;
+import javafx.animation.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
+import javafx.scene.text.*;
 import javafx.util.Duration;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 public class MainPane {
 
@@ -32,8 +24,8 @@ public class MainPane {
     private Pane pane;
     private int Attempts = 3;
     private int score = 0;
-    private double growthInterval = 80; // Initial growth interval in milliseconds
-    private double spawnInterval = 2000; // Initial spawn interval in milliseconds
+    private double growthInterval = 80;
+    private double spawnInterval = 2000;
     private RandomColorGenerator colorGenerator = new RandomColorGenerator();
     private ArrayList<Star> stars = new ArrayList<>();
     private Circle ball;
@@ -41,8 +33,8 @@ public class MainPane {
     private Text chancesText;
     private boolean gameOver = false;
 
-    private Timeline growStarsTimeline; // To dynamically adjust growth speed
-    private Timeline addStarTimeline;   // To dynamically adjust spawn interval
+    private Timeline growStarsTimeline;
+    private Timeline addStarTimeline;
 
     public MainPane() {
 
@@ -95,8 +87,8 @@ public class MainPane {
             }
         });
 
-        createAddStarTimeline(); // Initialize and start the spawn timeline
-        createGrowStarsTimeline(); // Initialize and start the growth timeline
+        createAddStarTimeline();
+        createGrowStarsTimeline();
     }
 
     private void createGrowStarsTimeline() {
@@ -206,13 +198,13 @@ public class MainPane {
         addStarTimeline.stop();
 
 
-        // Create the "GAME OVER" text
+
         Text gameOverText = new Text("GAME OVER");
         gameOverText.setFont(Font.font("System", FontWeight.BOLD, 50));
         gameOverText.setFill(Color.RED);
         gameOverText.setTextAlignment(TextAlignment.CENTER);
 
-        // Create the additional texts
+
         Text nameText = new Text("Name: " + name); // Assume `playerName` is a variable holding the player's name
         nameText.setFont(Font.font("System", FontWeight.NORMAL, 30));
         nameText.setFill(Color.WHITE);
@@ -225,16 +217,15 @@ public class MainPane {
         colorChangeText.setFont(Font.font("System", FontWeight.NORMAL, 30));
         colorChangeText.setFill(Color.WHITE);
 
-        // Use a VBox to stack the texts vertically
-        VBox textContainer = new VBox(20); // 20px spacing between texts
-        textContainer.setPrefWidth(800); // Match the pane width
-        textContainer.setStyle("-fx-alignment: center;"); // Center the VBox content
-        textContainer.setLayoutY(200); // Position the VBox on the screen
 
-        // Add texts to the VBox
+        VBox textContainer = new VBox(20);
+        textContainer.setPrefWidth(800);
+        textContainer.setStyle("-fx-alignment: center;");
+        textContainer.setLayoutY(200);
+
+
         textContainer.getChildren().addAll(gameOverText, nameText, scoreText, colorChangeText);
 
-        // Add the VBox to the pane
         pane.getChildren().add(textContainer);
     }
 
@@ -243,14 +234,13 @@ public class MainPane {
         score++;
         updateScoreText();
 
-        // Check if the score is a multiple of 3
         if (score % 3 == 0) {
-            // Halve the growth interval
+
             growthInterval = Math.max(10, growthInterval / 2);
             growStarsTimeline.stop();
             createGrowStarsTimeline();
 
-            // Halve the spawn interval
+
             spawnInterval = Math.max(250, spawnInterval / 2); // Ensure a minimum spawn interval
             addStarTimeline.stop();
             createAddStarTimeline();

@@ -7,7 +7,6 @@ public class Ball {
     private RandomColorGenerator colorGenerator = new RandomColorGenerator();
 
 
-    // Default Constructor
     public Ball() {
 
         ball = new Circle(200, 200, 10);
